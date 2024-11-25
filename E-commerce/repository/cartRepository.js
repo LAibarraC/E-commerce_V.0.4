@@ -1,5 +1,5 @@
 const Cart = require('../models/cart');
-const CartItem = require('../models/cartitem');
+const CartItem = require('../models/cartItem');
 
 class CartRepository {
     static async createCart(userId) {
