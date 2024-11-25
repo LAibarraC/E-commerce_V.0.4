@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ElectroShop - Register</title>
+    <link rel="stylesheet" href="/login/CSS/register.css">
+</head>
+
+<body>
+    <div class="register-container">
+        <div class="register-box">
+            <div class="logo">
+                <h1>ElectroShop</h1>
+                <img src="registro.png" alt="Logo de ElectroShop" class="logo-icon">
+            </div>
+            <form class="register" id="register-form">
+                <label class="txt" for="name">Nombre Completo</label>
+                <input type="text" id="name" placeholder="Nombre Completo" class="input-field" required>
+
+                <label class="txt" for="username">Username</label>
+                <input type="text" id="username" placeholder="Username" class="input-field" required>
+
+                <label class="txt" for="email">Email</label>
+                <input type="email" id="email" placeholder="Email" class="input-field" required>
+
+                <label class="txt" for="password">Password</label>
+                <input type="password" id="password" placeholder="Password" class="input-field" required>
+
+                <div class="btn">
+                    <button type="submit" class="register-button">Registrar</button>
+                </div>
+            </form>
+            <div id="error-message" class="error-message"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const registerForm = document.getElementById('register-form');
+            const errorMessage = document.getElementById('error-message');
+
+            // Manejar el evento de envío del formulario
+            registerForm.addEventListener('submit', async (e) => {
+                e.preventDefault(); // Prevenir el envío del formulario por defecto
+
+                // Limpiar mensajes de error previos
+                errorMessage.textContent = '';
+
+                // Obtener los datos del formulario
+                const name = document.getElementById('name').value;
+                const username = document.getElementById('username').value;
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                // Validar los datos
+                if (!username || !email || !password) {
+                    errorMessage.textContent = 'Por favor, complete todos los campos.';
+                    return;
+                }
+
+                // Validación del correo electrónico (expresión regular simple)
+                const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+                if (!emailPattern.test(email)) {
+                    errorMessage.textContent = 'Por favor, ingrese un correo electrónico válido.';
+                    return;
+                }
+
+                // Validación de contraseña (mínimo 6 caracteres)
+                if (password.length < 6) {
+                    errorMessage.textContent = 'La contraseña debe tener al menos 6 caracteres.';
+                    return;
+                }
+
+                const userData = {
+                    name,
+                    username,
+                    email,
+                    password
+                };
+
+                try {
+                    // Enviar los datos al servidor
+                    const response = await fetch('/api/register', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(userData)
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        alert('Usuario registrado exitosamente');
+                        window.location.href = '/login'; // Redirigir a la página de login
+                    } else {
+                        errorMessage.textContent = data.message || 'Hubo un error al registrar el usuario.';
+                    }
+                } catch (err) {
+                    console.error(err);
+                    errorMessage.textContent = 'Hubo un error en la solicitud, inténtelo de nuevo más tarde.';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

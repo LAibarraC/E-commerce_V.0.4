@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Producto</title>
+    <link rel="stylesheet" href="CSS/Addproduct.css">
+    <style>
+        /* Estilos para el mensaje de éxito */
+        #successMessage {
+            display: none;
+            /* Inicialmente oculto */
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            /* O el color que prefieras */
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            z-index: 1000;
+            /* Asegúrate de que esté por encima de otros elementos */
+            text-align: center;
+        }
+
+        /* Estilo para la superposición opaca */
+        #overlay {
+            display: none;
+            /* Inicialmente oculto */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            /* Fondo oscuro con opacidad */
+            z-index: 999;
+            /* Debe estar por debajo del mensaje de éxito */
+        }
+
+        .btnok {
+            padding: 5px;
+            border-radius: 5px;
+            background-color: rgb(0, 187, 0);
+            border: solid rgb(0, 187, 0);
+            width: 100px;
+            height: 30px;
+
+        }
+
+        #navbar-container {
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="navbar-container"></div>
+        <script>
+            fetch('/navbar/navbar.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('navbar-container').innerHTML = data;
+                    const menuButton = document.getElementById('menu-button');
+                    const submenu = document.getElementById('submenu');
+
+                    if (menuButton && submenu) {
+                        menuButton.addEventListener('click', function (event) {
+                            event.stopPropagation(); 
+                            if (submenu.style.display === 'none' || submenu.style.display === '') {
+                                submenu.style.display = 'block';
+                            } else {
+                                submenu.style.display = 'none';
+                            }
+                        });
+
+                        document.addEventListener('click', function (event) {
+                            if (!menuButton.contains(event.target) && !submenu.contains(event.target)) {
+                                submenu.style.display = 'none';
+                            }
+                        });
+                    }
+                })
+                .catch(error => console.error('Error al cargar el navbar:', error));
+        </script>
+    <script>
+        // Función para obtener los nombres de las categorías y llenarlos en el <select>
+        async function fetchCategoryNames() {
+            try {
+                const response = await fetch('/api/categories');
+                const categories = await response.json();
+
+                const categorySelect = document.getElementById('categoria');
+                categorySelect.innerHTML = ''; // Limpiar las opciones antes de agregar nuevas
+
+                // Agregar una opción por cada categoría (usar id para el valor)
+                categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.id;  // Asignar el ID como valor
+                    option.textContent = category.name; // Mostrar el nombre de la categoría
+                    categorySelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error al obtener categorías:', error);
+            }
+        }
+
+        window.onload = fetchCategoryNames; // Llama a la función al cargar la página
+    </script>
+    <br>
+    <main>
+        <h2>NUEVO PRODUCTO</h2>
+
+        <form class="product_form_create" id="addProductForm" method="POST" action="/api/products"
+            enctype="multipart/form-data">
+            <div class="datos">
+                <div class="caja1">
+                    <label for="nombre">Nombre del Producto:</label><br>
+                    <input type="text" id="name" name="name"><br>
+                    <label for="codigo">Codigo del producto:</label><br>
+                    <input type="text" id="codigo" name="code"><br>
+                    <label for="brand">Marca:</label><br>
+                    <input type="text" id="brand" name="brand"><br>
+                    <label for="color">Estrellas:</label><br>
+                    <input type="number" id="rating" name="rating"><br>
+                    <label for="price">Precio:</label><br>
+                    <input type="number" id="price" name="price" min="0" required><br>
+                    <label for="descuento">Descuento:</label><br>
+                    <input type="number" id="descuento" name="discount" min="0" required><br>
+                    <label for="longitud">Longitud:</label><br>
+                    <input type="number" id="longitud" name="length" min="0" required><br>
+                    <label for="altura">Altura:</label><br>
+                    <input type="number" id="altura" name="height" min="0" required><br>
+                    <label for="estado">Estado:</label><br>
+                    <div class="selectors">
+                        <select id="estado" name="status" required>
+                            <option value="true">Disponible</option>
+                            <option value="false">No disponible</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="caja1">
+                    <label for="model">Modelo:</label><br>
+                    <input type="text" id="model" name="model" required><br>
+                    <label for="disponible">Cantidad Disponible:</label><br>
+                    <input type="number" id="disponible" name="stock" min="0" required><br>
+                    <label for="peso">Peso:</label><br>
+                    <input type="number" id="peso" name="weight" min="0" required><br>
+                    <label for="ancho">Ancho:</label><br>
+                    <input type="number" id="ancho" name="width" min="0" required><br>
+                    <label for="garantia">Garantia:</label><br>
+                    <input type="number" id="garantia" name="warranty" min="0" required><br>
+                    <label for="description">Descripción:</label><br>
+                    <textarea id="description" name="description" required></textarea><br>
+                    <label for="tags">Etiquetas:</label><br>
+                    <input type="text" id="tags" name="tags" placeholder="separar etiquetas por comas"><br><br>
+   
+                    <div class="selectors">
+                        <label for="categoria">Categoría:</label>
+                        <select id="categoria" name="categoryId" required>
+                            <option value="">Seleccione una categoría</option>
+                            <!-- Las opciones de categoría se insertarán aquí -->
+                        </select>
+                    </div>
+                </div>
+                <div class="caja1">
+                    <h3 class="txt">Imágenes del producto</h3><br>
+                    <div class="image-upload-container">
+                        <div class="image-box">
+                            <div class="image-preview" id="imagePreview1">Agregar +</div>
+                            <input type="file" id="imageInput1" name="image1" accept="image/*" class="hidden-input">
+                            <button type="button" class="uploadButton" data-target="imageInput1">Subir Imagen</button>
+                            
+                        </div>
+                        <div class="image-box">
+                            <div class="image-preview" id="imagePreview2">Agregar +</div>
+                            <input type="file" id="imageInput2" name="image2" accept="image/*" class="hidden-input">
+                            <button type="button" class="uploadButton" data-target="imageInput2">Subir Imagen</button>
+                        </div>
+                        <div class="image-box">
+                            <div class="image-preview" id="imagePreview3">Agregar +</div>
+                            <input type="file" id="imageInput3" name="image3" accept="image/*" class="hidden-input">
+                            <button type="button" class="uploadButton" data-target="imageInput3">Subir Imagen</button>
+                        </div>
+                    </div>
+                    <div class="col">
+                            <label for="color">Color:</label><br>
+                            <input class="cs" type="text" id="color1" name="color1"><br>
+                            <div class="cuadr"> </div>
+                            <label for="color">Color:</label><br>
+                            <input class="cs" type="text" id="color2" name="color2"><br>
+                            <div class="cuadr"></div>
+                            <label for="color">Color:</label><br>
+                            <input class="cs" type="text" id="color3" name="color3"><br>
+                    </div>
+                    
+                </div>
+            </div>
+            <button type="submit" class="submit-btn">Guardar Producto</button>
+        </form>
+
+        <!-- Superposición opaca -->
+        <div id="overlay"></div>
+
+        <!-- Mensaje de éxito -->
+        <div id="successMessage">
+            <h3>Producto agregado correctamente</h3><br><br>
+            <button class="btnok" id="okButton">OK</button>
+        </div>
+    </main>
+
+    <script>
+        document.querySelectorAll('.uploadButton').forEach(button => {
+            button.addEventListener('click', function () {
+                const target = this.getAttribute('data-target');
+                document.getElementById(target).click();
+            });
+        });
+
+        document.querySelectorAll('input[type="file"]').forEach(input => {
+            input.addEventListener('change', function (event) {
+                const files = event.target.files;
+                const previewElement = event.target.previousElementSibling;
+                if (files.length > 0) {
+                    const file = files[0];
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        previewElement.innerHTML = ''; // Limpia cualquier contenido anterior
+                        previewElement.appendChild(img); // Agrega la nueva imagen
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+
+        document.getElementById('addProductForm').addEventListener('submit', async function (event) {
+            event.preventDefault(); // Prevenir el envío predeterminado del formulario
+
+            const formData = new FormData(this); // Crear un objeto FormData para manejar los datos del formulario
+
+            try {
+                const response = await fetch(this.action, {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const result = await response.json(); // Lee la respuesta como JSON
+                if (response.ok && result.success) {
+                    document.getElementById('overlay').style.display = 'block'; // Mostrar superposición opaca
+                    document.getElementById('successMessage').style.display = 'block'; // Mostrar mensaje de éxito
+
+                    // Ocultar el mensaje de éxito y limpiar el formulario al hacer clic en "OK"
+                    document.getElementById('okButton').addEventListener('click', () => {
+                        document.getElementById('successMessage').style.display = 'none'; // Ocultar el mensaje
+                        document.getElementById('overlay').style.display = 'none'; // Ocultar superposición
+                        this.reset(); // Limpiar el formulario después de confirmar
+                        // Limpiar vistas de las imágenes
+                        document.getElementById('imagePreview1').innerHTML = 'Agregar +';
+                        document.getElementById('imagePreview2').innerHTML = 'Agregar +';
+                        document.getElementById('imagePreview3').innerHTML = 'Agregar +';
+                    });
+                } else {
+                    throw new Error(result.message || 'Error en la carga del producto');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Hubo un problema con la carga del producto: ' + error.message);
+            }
+        });
+    </script>
+</body>
+
+</html>

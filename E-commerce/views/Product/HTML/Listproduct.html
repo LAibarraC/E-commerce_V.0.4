@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listproduct</title>
+    <link rel="stylesheet" href="/CSS/Listproduct.css">
+    <style>
+        /* Estilo del modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0, 0, 0);
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 250px;
+            text-align: center;
+            border-radius: 10px;
+        }
+
+        #ok-button {
+            padding: 5px;
+            border-radius: 5px;
+            background-color: rgba(253, 56, 79, 1);
+            border: solid rgba(253, 56, 79, 1);
+            width: 100px;
+            height: 30px;
+        }
+
+        #ok-button:hover {
+            background-color: #d70101;
+        }
+
+        #navbar-container {
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="navbar-container"></div>
+
+    <script>
+        // Cargar la barra de navegación
+        fetch('/navbar/navbar.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('navbar-container').innerHTML = data;
+                    const menuButton = document.getElementById('menu-button');
+                    const submenu = document.getElementById('submenu');
+
+                    if (menuButton && submenu) {
+                        menuButton.addEventListener('click', function (event) {
+                            event.stopPropagation(); 
+                            if (submenu.style.display === 'none' || submenu.style.display === '') {
+                                submenu.style.display = 'block';
+                            } else {
+                                submenu.style.display = 'none';
+                            }
+                        });
+
+                        document.addEventListener('click', function (event) {
+                            if (!menuButton.contains(event.target) && !submenu.contains(event.target)) {
+                                submenu.style.display = 'none';
+                            }
+                        });
+                    }
+                })
+                .catch(error => console.error('Error al cargar el navbar:', error));
+
+        // Función para cargar productos
+        function loadProducts() {
+            fetch('/api/products')
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data); // Imprimir la respuesta en la consola para verificar
+                    if (data.success && Array.isArray(data.products)) {
+                        const productList = document.getElementById('product-list');
+                        productList.innerHTML = ''; // Limpiar la lista de productos
+                        data.products.forEach(product => {
+                            const productItem = document.createElement('div');
+                            productItem.classList.add('product-item');
+                            productItem.innerHTML = `
+                                <div class="product-info">
+                                    <img src="/uploads/products/${product.image1}" alt="Producto" class="product-image">
+                                    <div class="product-details">
+                                        <p><strong>Nombre del Producto:</strong> ${product.name}</p><br>
+                                        <p><strong>Modelo:</strong> ${product.model}</p><br>
+                                        <p><strong>Marca:</strong> ${product.brand}</p><br>
+                                        <p><strong>Precio:</strong> $${product.price.toFixed(2)}</p>
+                                    </div>
+                                </div>
+                                <div class="product-actions">
+                                    <button class="action-button delete" data-id="${product.id}">
+                                        <img class="icono" src="eliminar.png" alt="Icono">
+                                    </button>
+                                    <button class="action-button details" data-id="${product.id}">
+                                        <img class="icono" src="vista.png" alt="Icono">
+                                    </button>
+                                    <button class="action-button edit"><img class="icono" src="editar.png" alt="Icono"></button>
+                                </div>
+                            `;
+                            productList.appendChild(productItem);
+                        });
+
+                        // Agregar evento de clic a los botones de eliminar
+                        document.querySelectorAll('.delete').forEach(button => {
+                            button.addEventListener('click', function () {
+                                const productId = this.getAttribute('data-id');
+                                deleteProduct(productId);
+                            });
+                        });
+
+                        // Agregar evento de clic a los botones de detalles
+                        document.querySelectorAll('.details').forEach(button => {
+                            button.addEventListener('click', function () {
+                                const productId = this.getAttribute('data-id');
+                                window.location.href = `http://localhost:3000/viewproduct/${productId}`; // Cambia esta URL por la de tu página de detalles
+                            });
+                        });
+                    } else {
+                        console.error('Estructura de respuesta no válida', data);
+                    }
+                })
+                .catch(error => console.error('Error al cargar los productos:', error));
+        }
+
+        // Función para eliminar un producto
+        function deleteProduct(productId) {
+            fetch(`http://localhost:3000/api/products/${productId}`, {
+                method: 'DELETE'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showConfirmationModal(); // Mostrar modal de confirmación
+                        loadProducts(); // Recargar productos después de la eliminación
+                    } else {
+                        console.error('Error al eliminar el producto', data);
+                    }
+                })
+                .catch(error => console.error('Error al eliminar el producto:', error));
+        }
+
+        // Función para mostrar el modal de confirmación
+        function showConfirmationModal() {
+            const modal = document.getElementById("confirmation-modal");
+            modal.style.display = "block";
+        }
+
+        // Cerrar el modal cuando se hace clic en el botón OK
+        document.addEventListener("click", function (event) {
+            if (event.target.id === "ok-button") {
+                document.getElementById("confirmation-modal").style.display = "none";
+            }
+        });
+
+        // Cargar productos al inicio
+        loadProducts();
+    </script>
+
+    <br>
+    <div class="product-list-container">
+        <div class="caja1">
+            <div class="item">
+                <h2>LISTA DE PRODUCTOS</h2>
+            </div>
+            <div class="item1">
+                <button class="add_product_button" id="add-product-btn">Nuevo Producto</button>
+            </div>
+        </div>
+        <div id="product-list"></div>
+    </div>
+
+    <!-- Modal de Confirmación -->
+    <div id="confirmation-modal" class="modal">
+        <div class="modal-content">
+            <p id="confirmation-message">
+            <h4>Producto eliminado</h4>
+            </p><br>
+            <button id="ok-button">OK</button>
+        </div>
+    </div>
+
+    <script>
+        // Redirigir al hacer clic en "Nuevo Producto"
+        document.getElementById('add-product-btn').addEventListener('click', function () {
+            window.location.href = '/addproduct'; // Cambia esta URL por la de tu página
+        });
+    </script>
+</body>
+
+</html>

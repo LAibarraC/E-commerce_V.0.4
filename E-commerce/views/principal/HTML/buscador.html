@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscador</title>
+    <link rel="stylesheet" href="../CSS/buscador.css">
+</head>
+
+<body>
+    <div id="navbar-container">
+        <script>
+            fetch('/navbar/navbar.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('navbar-container').innerHTML = data;
+
+                    // Menú desplegable
+                    const menuButton = document.getElementById('menu-button');
+                    const submenu = document.getElementById('submenu');
+                    if (menuButton && submenu) {
+                        menuButton.addEventListener('click', function (event) {
+                            event.stopPropagation();
+                            if (submenu.style.display === 'none' || submenu.style.display === '') {
+                                submenu.style.display = 'block';
+                            } else {
+                                submenu.style.display = 'none';
+                            }
+                        });
+                        document.addEventListener('click', function (event) {
+                            if (!menuButton.contains(event.target) && !submenu.contains(event.target)) {
+                                submenu.style.display = 'none';
+                            }
+                        });
+                    }
+
+                    // Redirigir al carrito
+                    const navbarcarrito = document.querySelector('.cart-icon');
+                    if (navbarcarrito) {
+                        navbarcarrito.addEventListener('click', () => {
+                            window.location.href = '/carrito';
+                        });
+                    }
+
+                    // Redirigir al logo
+                    const navbarLogo = document.querySelector('.navbar-logo');
+                    if (navbarLogo) {
+                        navbarLogo.addEventListener('click', () => {
+                            window.location.href = '/principal';
+                        });
+                    }
+
+                    // Búsqueda
+                    const searchInput = document.querySelector('.navbar-search input');
+                    const searchButton = document.querySelector('.navbar-search .search-button');
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const query = urlParams.get('q');
+                    if (query && searchInput) {
+                        searchInput.value = decodeURIComponent(query);
+                    }
+                    if (searchInput && searchButton) {
+                        searchButton.addEventListener('click', () => {
+                            const query = searchInput.value.trim();
+                            if (query) {
+                                window.location.href = `/search?q=${encodeURIComponent(query)}`;
+                            } else {
+                                alert("Por favor ingresa un término de búsqueda.");
+                            }
+                        });
+                    }
+
+                    // Nombre de usuario
+                    const userName = localStorage.getItem('userName');
+                    const registerLink = document.querySelector('#register-link');
+                    const userId = localStorage.getItem('userId');
+
+                    if (userName && registerLink) {
+                        registerLink.textContent = userName;
+                        registerLink.href = '/perfil';
+                    }
+
+                    if (userId) {
+                        fetch(`/api/carts/${userId}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success && data.cart && data.cart.id) {
+                                    const cartId = data.cart.id;
+                                    localStorage.setItem('cartId', cartId);
+                                    console.log(cartId);
+                                    actualizarContadorCarrito(cartId);
+                                } else {
+                                    console.error('No se encontró cartId para el usuario');
+                                }
+                            })
+                            .catch(error => console.error('Error al obtener cartId del usuario:', error));
+                    }
+                })
+                .catch(error => console.error('Error al cargar el navbar:', error));
+
+            function actualizarContadorCarrito(cartId) {
+                if (!cartId) {
+                    console.error('No se encontró un cartId válido en localStorage.');
+                    return;
+                }
+
+                fetch(`/api/totalitemscart/${cartId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Error al hacer la solicitud a la API');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Respuesta de la API:', data);
+                        if (data.totalItems !== undefined) {
+                            const cartCountElement = document.getElementById('cart-count');
+                            if (cartCountElement) {
+                                cartCountElement.innerText = data.totalItems || 0; // Actualiza el contador
+                            }
+                        } else {
+                            console.error('Error: No se encontró el total de artículos en la respuesta');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al obtener el total de items del carrito:', error);
+                    });
+            }
+        </script>
+    </div>
+
+    <div class="container">
+        <div class="filtro">
+            <div class="fil">Filtro:</div>
+            <div class="pre">Precio:</div>
+            <div><input class="numero" id="precioMin" type="number"></div>bs.&nbsp;&nbsp;
+            <div class="h">Hasta:</div>
+            <div><input class="numero" id="precioMax" type="number"></div>&nbsp;bs.
+        </div>
+        <div class="ordenar">
+            <div class="or">Ordenar por:&nbsp;</div>
+            <div><button class="bn" id="nuevosBtn">Nuevos</button></div>
+            <div><button class="bn" id="popularesBtn">Populares</button></div>
+        </div>
+    </div>
+
+    <div class="contenido" id="contenido">
+    </div>
+
+    <script>
+        let searchQuery = new URLSearchParams(window.location.search).get('q') || '';
+
+        // Función para realizar la búsqueda y mostrar los resultados
+        function realizarBusqueda(query) {
+            if (query) {
+                fetch(`/api/prod/search?query=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        mostrarResultados(data);
+                    })
+                    .catch(error => {
+                        console.error('Error al obtener los resultados:', error);
+                        const resultsDiv = document.getElementById('contenido');
+                        resultsDiv.innerHTML = `<div class="error">Ocurrió un error al realizar la búsqueda. Inténtalo nuevamente.</div>`;
+                    });
+            }
+        }
+
+        function mostrarResultados(data) {
+            const resultsDiv = document.getElementById('contenido');
+            resultsDiv.innerHTML = '';
+
+            if (data.success && Array.isArray(data.products) && data.products.length > 0) {
+                data.products.forEach(product => {
+                    const divTarjeta = document.createElement('div');
+                    divTarjeta.classList.add('tarjeta');
+                    divTarjeta.innerHTML = `
+                    <div class="product">
+                        <div class="imagen">
+                            <img src="/uploads/products/${product.image1}" width="100%" height="100%">
+                        </div>
+                        <div class="nombre">${product.name}</div>
+                        <div class="estrellas">${mostrarCalificacion(product.rating)} <span class="cali">&nbsp;&nbsp;${product.rating}</span></div>
+                        <div class="precio">
+                            <span>Precio:&nbsp;</span><span>${product.price}</span><span>&nbsp;Bs.</span>
+                        </div>
+                        <div class="descuento">
+                            <span>Descuento:&nbsp;</span><span>${product.discount}</span><span>&nbsp;%</span>
+                        </div>
+                        <div class="visualizar">
+                            <button class="btnn" data-id="${product.id}">Visualizar</button>
+                        </div>
+                    </div>
+                    `;
+                    resultsDiv.appendChild(divTarjeta);
+                });
+
+                const botonesVisualizar = document.querySelectorAll('.btnn');
+                botonesVisualizar.forEach(boton => {
+                    boton.addEventListener('click', (event) => {
+                        const productId = event.target.getAttribute('data-id');
+                        if (productId) {
+                            window.location.href = `/product-details/${productId}`;
+                        }
+                    });
+                });
+            } else {
+                resultsDiv.innerHTML = `<div class="error">No se encontraron resultados para "${searchQuery}".</div>`;
+            }
+        }
+
+        function mostrarCalificacion(rating) {
+            const estrellasCompletas = Math.floor(rating);
+            const estrellasVacías = 5 - Math.ceil(rating);
+            const estrellasParciales = rating % 1;
+            let estrellasHTML = '';
+            estrellasHTML += '★'.repeat(estrellasCompletas);
+            if (estrellasParciales > 0) {
+                estrellasHTML += '★';
+            }
+            estrellasHTML += '☆'.repeat(estrellasVacías);
+            return estrellasHTML;
+        }
+
+        // Función para realizar la búsqueda con filtro de precio
+        function aplicarFiltroPrecio() {
+            const precioMin = document.getElementById('precioMin').value;
+            const precioMax = document.getElementById('precioMax').value;
+            fetch(`/api/prod/search/maxmin?query=${encodeURIComponent(searchQuery)}&precioMin=${precioMin}&precioMax=${precioMax}`)
+                .then(response => response.json())
+                .then(data => mostrarResultados(data))
+                .catch(error => console.error('Error al aplicar filtro de precio:', error));
+        }
+
+        // Función para ordenar por nuevos
+        function ordenarPorNuevos() {
+            fetch(`/api/prod/search/newarrivals?query=${encodeURIComponent(searchQuery)}`)
+                .then(response => response.json())
+                .then(data => mostrarResultados(data))
+                .catch(error => console.error('Error al ordenar por nuevos:', error));
+        }
+
+        // Función para ordenar por populares
+        function ordenarPorPopulares() {
+            fetch(`/api/prod/search/popular?query=${encodeURIComponent(searchQuery)}`)
+                .then(response => response.json())
+                .then(data => mostrarResultados(data))
+                .catch(error => console.error('Error al ordenar por populares:', error));
+        }
+
+        // Agregar eventos a los botones
+        document.getElementById('nuevosBtn').addEventListener('click', ordenarPorNuevos);
+        document.getElementById('popularesBtn').addEventListener('click', ordenarPorPopulares);
+        document.getElementById('precioMin').addEventListener('change', aplicarFiltroPrecio);
+        document.getElementById('precioMax').addEventListener('change', aplicarFiltroPrecio);
+
+        // Realizar la búsqueda inicial
+        realizarBusqueda(searchQuery);
+    </script>
+</body>
+
+</html>

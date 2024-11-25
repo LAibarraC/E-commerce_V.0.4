@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navegador ElectroShop</title>
+    <link rel="stylesheet" href="../navbar.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="navbar-menu">
+            <button id="menu-button" class="menu-button">
+                <img src="../menu.png" alt="Menu" class="menu-icon">
+                <span>Menu</span>
+            </button>
+            <ul id="submenu" class="submenu">
+                <li><img src="../icon/usuario.png" width="20px"><a href="#">Usuario</a></li>
+                <li><img src="../icon/carrito.png" width="20px"><a href="#">Carrito</a></li>
+                <li><img src="../icon/pago.png" width="20px"><a href="#">Pago</a></li>
+                <li><img src="../icon/confi.png" width="20px"><a href="#">Configuracion</a></li>
+            </ul>
+        </div>
+        <div class="navbar-logo">
+            <h1>ElectroShop</h1>
+        </div>
+        <div class="navbar-search">
+            <input type="text"  id="search-input" placeholder="Buscar">
+            <button id="search-button" class="search-button">
+                <img src="../lupa.png" alt="Buscar">
+            </button>
+        </div>
+        <div class="navbar-links">
+            <a href="#" id="register-link">Registro</a>
+            <img src="../usuario.png" alt="User" class="user-icon">
+            <a href="#">Carrito</a>
+            <img src="../carrito.png" alt="Carrito" class="cart-icon">
+            <span id="cart-count" class="cart-count">0</span>
+        </div>
+    </nav>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuButton = document.getElementById('menu-button');
+            const submenu = document.getElementById('submenu');
+
+            menuButton.addEventListener('click', (event) => {
+                event.stopPropagation(); // Evita que el evento se propague.
+                submenu.style.display =
+                    submenu.style.display === 'block' ? 'none' : 'block'; // Alterna el submenú.
+            });
+
+            // Cierra el submenú si se hace clic fuera del botón o del submenú.
+            document.addEventListener('click', (event) => {
+                if (!submenu.contains(event.target) && event.target !== menuButton) {
+                    submenu.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

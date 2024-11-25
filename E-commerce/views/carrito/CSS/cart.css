@@ -1,0 +1,219 @@
+.container{
+    width: 95%;
+    height: 100%;
+    display: flex;
+    margin: auto;
+    margin-top: 20px;
+}
+
+.cart-container{
+    width: 65%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.cart-nota{
+    width: 100%;
+    height: 55px;
+    background-color: rgba(245, 245, 245, 1);
+    display: flex;
+    align-items: center;
+    border-radius: 10px;
+}
+.nota{
+    width: 70%;
+}
+.todos{
+    width: 30%;
+    display: flex;
+    align-items: center;
+
+}
+
+.cart-item{
+    margin-top: 5px;
+    
+}
+
+.item{
+    background-color: rgba(245, 245, 245, 1);
+    border-radius: 10px;
+    display: flex;
+    padding: 10px;
+    height: 170px;
+    margin-top: 15px;
+    font-size: 13px;
+}
+.sel{
+    display: flex;
+    align-items: center;
+}
+.selec{
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+}
+.imagen{
+    width: 100px;
+    height: 110px;
+    margin-left: 10px;
+}
+
+
+.datos{
+    margin-left: 20px;
+    width: 70%;
+
+}
+.nombre{
+    margin-top: 10px;
+    background-color: white; 
+    padding: 5px;
+    border-radius: 5px;
+}
+.descrip{
+    background-color: white; 
+    margin-top: 10px;
+    padding: 5px;
+    border-radius: 5px;
+}
+.precio{
+    background-color: white; ;
+    margin-top: 10px;
+    padding: 5px;
+    border-radius: 5px;
+}
+.envio{
+    background-color: white; 
+    margin-top: 10px;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.add{
+    width: 10%;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+}
+.borrar{
+    width: 30px;
+    height: 30px;
+    transition: transform 0.2s ease;
+}
+.borrar:hover {
+    transform: scale(1.05); 
+}
+
+.btnc{
+    width: 30px;
+    height:20px;
+}
+.btnc:hover {
+    border: 1px solid black;
+    background-color: white; 
+    color: black; 
+}
+
+
+.btncc{
+    width: 30px;
+    height:20px;
+}
+.btncc:hover {
+    border: 1px solid black;
+    background-color: white; 
+    color: black; 
+}
+
+.cant{
+    margin-top: 87px;
+    display: flex;
+    align-items: end;
+}
+
+.resumen{
+    width: 35%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+}
+.pago{
+    background-color: rgba(245, 245, 245, 1);
+    width: 60%;
+    height: 250px;
+    border-radius: 10px;
+    padding: 5px;
+}
+
+
+.resu{
+    width: 100%;
+    font-size: 20px;
+    margin-top: 5px;
+}
+.sub{
+    background-color: white;
+    width: 95%;
+    margin-top: 15px;
+    padding: 5px;
+    border-radius: 5px;
+}
+.gasto{
+    background-color: white;
+    width: 95%;
+    margin-top: 15px;
+    padding: 5px;
+    border-radius: 5px;
+}
+.total{
+    background-color: white;
+    width: 95%;
+    margin-top: 15px;
+    padding: 5px;
+    border-radius: 5px;
+}
+.car{
+    width: 150px;
+    border: none;
+    padding: 5px;
+    margin-top: 5px;
+    border-radius: 5px;
+    background-color: rgba(253, 56, 79, 1);
+    color: white;
+    cursor: pointer; 
+    transition: transform 0.2s ease; 
+
+}
+.car:hover {
+    transform: scale(1.05); 
+}
+.bb{
+    width: 100%;
+    text-align: center;
+    margin-top: 45px;
+
+}
+
+
+.forma{
+    width: 60%;
+    height: 150px;
+    margin-top: 30px;
+    background-color: rgba(245, 245, 245, 1);
+    border-radius: 10px;
+}
+.p{
+    font-size: 18px;
+    padding: 10px;
+
+}
+.tipo{
+    width: 260px;
+    height: 75px;
+    padding: 10px;
+}
+

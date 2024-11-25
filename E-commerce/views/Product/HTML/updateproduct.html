@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Product</title>
+    <link rel="stylesheet" href="../CSS/updateproduct.css">
+</head>
+
+<body>
+    <div id="navbar-container"></div>
+    <script>
+        fetch('/navbar/navbar.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('navbar-container').innerHTML = data;
+                    const menuButton = document.getElementById('menu-button');
+                    const submenu = document.getElementById('submenu');
+
+                    if (menuButton && submenu) {
+                        menuButton.addEventListener('click', function (event) {
+                            event.stopPropagation(); 
+                            if (submenu.style.display === 'none' || submenu.style.display === '') {
+                                submenu.style.display = 'block';
+                            } else {
+                                submenu.style.display = 'none';
+                            }
+                        });
+
+                        document.addEventListener('click', function (event) {
+                            if (!menuButton.contains(event.target) && !submenu.contains(event.target)) {
+                                submenu.style.display = 'none';
+                            }
+                        });
+                    }
+                })
+                .catch(error => console.error('Error al cargar el navbar:', error));
+    </script>
+    <br>
+    <!--<div class="product-list-btn">
+        <button onclick="location.href='products.html'">Lista de Productos</button>
+    </div>!-->
+    <main>
+        <h2>ACTUALIZACION DEL PRODUCTO</h2>
+
+        <form class="product_form_create" id="addProductForm">
+            <div class="datos">
+                <div class="caja1">
+                    <label for="nombre">Nombre del Producto:</label><br>
+                    <input type="text" id="nombre" name="nombre"><br>
+                    <label for="codigo">Codigo del producto:</label><br>
+                    <input type="text" id="codigo" name="codigo"><br>
+                    <label for="brand">Marca:</label><br>
+                    <input type="text" id="brand" name="brand"><br>
+                    <label for="color">Color:</label><br>
+                    <input type="text" id="color" name="color"><br>
+                    <label for="price">Precio:</label><br>
+                    <input type="number" id="price" name="price" min="0" required><br>
+                    <label for="descuento">Descuento:</label><br>
+                    <input type="number" id="descuento" name="descuento" min="0" required><br>
+                    <label for="longitud">Longitud:</label><br>
+                    <input type="number" id="longitud" name="longitud" min="0" required><br>
+                    <label for="altura">Altura:</label><br>
+                    <input type="number" id="altura" name="altura" min="0" required><br>
+                    <label for="estado">Estado:</label><br>
+                    <div class="selectors">
+                        <select id="estado" name="estado" required>
+                            <option value="1">disponible</option>
+                            <option value="0">No disponible</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="caja1">
+                    <label for="model">Modelo:</label><br>
+                    <input type="text" id="model" name="model" required><br>
+                    <label for="disponible">Cantidad Disponible:</label><br>
+                    <input type="number" id="disponible" name="disponible" min="0" required><br>
+                    <label for="peso">Peso:</label><br>
+                    <input type="number" id="peso" name="peso" min="0" required><br>
+                    <label for="ancho">Ancho:</label><br>
+                    <input type="number" id="ancho" name="ancho" min="0" required><br>
+                    <label for="garantia">Garantia:</label><br>
+                    <input type="number" id="garantia" name="garantia" min="0" required><br>
+                    <label for="description">Descripción:</label><br>
+                    <textarea id="description" name="description" required></textarea><br>
+                    <div class="selectors">
+                        <label for="categoria">Categoría:</label>
+                        <select id="categoria" name="categoria" required>
+                        </select><br>
+                    </div>
+                </div>
+                <div class="caja1">
+                    <h3 class="txt">Imágenes del producto</h3><br>
+                    <div class="image-upload-container">
+                        <div class="image-box">
+                            <div class="image-preview" id="imagePreview1">Agregar +</div>
+                            <input type="file" id="imageInput1" accept="image/*" class="hidden-input">
+                            <button type="button" class="uploadButton" data-target="imageInput1">Actualizar
+                                Imagen</button>
+                        </div>
+                        <div class="image-box">
+                            <div class="image-preview" id="imagePreview2">Agregar +</div>
+                            <input type="file" id="imageInput2" accept="image/*" class="hidden-input">
+                            <button type="button" class="uploadButton" data-target="imageInput2">Actualizar
+                                Imagen</button>
+                        </div>
+                        <div class="image-box">
+                            <div class="image-preview" id="imagePreview3">Agregar +</div>
+                            <input type="file" id="imageInput3" accept="image/*" class="hidden-input">
+                            <button type="button" class="uploadButton" data-target="imageInput3">Actualizar
+                                Imagen</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <button type="submit" class="submit-btn">Guardar</button>
+        </form>
+    </main>
+
+    <script>
+        document.querySelectorAll('.uploadButton').forEach(button => {
+            button.addEventListener('click', function () {
+                const target = this.getAttribute('data-target');
+                document.getElementById(target).click();
+            });
+        });
+
+        document.querySelectorAll('input[type="file"]').forEach(input => {
+            input.addEventListener('change', function (event) {
+                const files = event.target.files;
+                const previewId = event.target.nextElementSibling.getAttribute('data-target');
+                const previewElement = event.target.previousElementSibling;
+                if (files.length > 0) {
+                    const file = files[0];
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        previewElement.innerHTML = '';
+                        previewElement.appendChild(img);
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

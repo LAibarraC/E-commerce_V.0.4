@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles del Producto</title>
+    <link rel="stylesheet" href="/CSS/viewproduct.css">
+    <link rel="stylesheet" href="/navbar/navbar.css"> 
+ <style>
+
+ </style>
+</head>
+<body>
+    <div id="navbar-container">
+        <script>
+             fetch('/navbar/navbar.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('navbar-container').innerHTML = data;
+                    const menuButton = document.getElementById('menu-button');
+                    const submenu = document.getElementById('submenu');
+
+                    if (menuButton && submenu) {
+                        menuButton.addEventListener('click', function (event) {
+                            event.stopPropagation(); 
+                            if (submenu.style.display === 'none' || submenu.style.display === '') {
+                                submenu.style.display = 'block';
+                            } else {
+                                submenu.style.display = 'none';
+                            }
+                        });
+
+                        document.addEventListener('click', function (event) {
+                            if (!menuButton.contains(event.target) && !submenu.contains(event.target)) {
+                                submenu.style.display = 'none';
+                            }
+                        });
+                    }
+                })
+                .catch(error => console.error('Error al cargar el navbar:', error));
+        </script>
+
+    </div>
+    <br><br>
+    <div class="container">
+        <div class="left-column">
+            <!-- Imágenes pequeñas -->
+            <img class="small-image" id="small-image1" src="" alt="Small image of the product">
+            <img class="small-image" id="small-image2" src="" alt="Small image of the product in use">
+        </div>
+        <div class="center-column">
+            <!-- Imagen principal -->
+            <img class="main-image" id="main-image" src="" alt="Main image of the product">
+        </div>
+        <div class="right-column">
+            <div class="datos">
+                <h2>Detalles del Producto</h2>
+                <p><span>Nombre del Producto:</span> <span class="data" id="product-name"></span></p>
+                <p><span>Descripción:</span> <span class="data"  id="product-description"></span></p>
+                <p><span>Marca:</span> <span class="data" id="product-brand"></span></p>
+                <p><span>Color:</span> <span class="data" id="product-color"></span></p>
+                <p><span>Modelo:</span> <span class="data" id="product-model"></span></p>
+                <p><span>Estado:</span> <span class="data" id="product-status"></span></p>
+                <p><span>Descuento:</span> <span class="data" id="product-discount"></span></p>
+                <p><span>Altura:</span> <span class="data" id="product-height"></span></p>
+                <p><span>Longitud:</span> <span class="data" id="product-length"></span></p>
+                <p><span>Cantidad Disponible:</span> <span class="data" id="product-quantity"></span></p>
+                <p><span>Peso:</span> <span class="data" id="product-weight"></span></p>
+                <p><span>Garantía:</span> <span class="data" id="product-warranty"></span></p>
+                <p><span>Etiquetas:</span> <span class="data" id="product-tags"></span></p>
+                <p><span>Categoría:</span> <span class="data" id="product-category"></span></p>
+                <p><span>Precio:</span> <span class="data" id="product-price"></span></p>
+            </div>
+            
+        </div>
+    </div>
+
+    <script>
+        // Cargar el navbar desde un archivo HTML
+        fetch('../navbar/navbar.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('navbar-container').innerHTML = data;
+            })
+            .catch(error => console.error('Error al cargar el navbar:', error));
+    </script>
+
+    <script>
+        // Función para obtener el ID del producto de la URL
+        function getProductId() {
+            const pathParts = window.location.pathname.split('/');
+            return pathParts[pathParts.length - 1]; // Obtener el ID del producto
+        }
+
+        // Función para cargar los detalles del producto
+        function loadProductDetails() {
+            const productId = getProductId();
+            fetch(`/api/products/${productId}`) // Verifica que esta URL sea correcta
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const product = data.product;
+                        // Asignar los valores a los elementos HTML
+                        document.getElementById('product-name').textContent = product.name;
+                        document.getElementById('product-description').textContent = product.description;
+                        document.getElementById('product-brand').textContent = product.brand;
+                        document.getElementById('product-color').textContent = product.color;
+                        document.getElementById('product-model').textContent = product.model;
+                        document.getElementById('product-status').textContent = "Disponible";
+                        document.getElementById('product-discount').textContent = product.discount;
+                        document.getElementById('product-height').textContent = product.height;
+                        document.getElementById('product-length').textContent = product.length;
+                        document.getElementById('product-quantity').textContent = product.quantity;
+                        document.getElementById('product-weight').textContent = product.weight;
+                        document.getElementById('product-warranty').textContent = product.warranty;
+                        document.getElementById('product-tags').textContent = product.tags;
+                        // Asignar los valores a los elementos HTML
+                        document.getElementById('product-category').textContent = 'Teléfonos Móviles y Accesorios'; // Cambia esto
+
+                        document.getElementById('product-price').textContent = `$${product.price.toFixed(2)}`;
+
+                        // Actualizar imágenes
+                        document.getElementById('main-image').src = `/uploads/products/${product.image1}`;
+                        document.getElementById('small-image1').src = `/uploads/products/${product.image2}`;
+                        document.getElementById('small-image2').src = `/uploads/products/${product.image3}`;
+                    } else {
+                        console.error('Producto no encontrado o error en la API', data);
+                    }
+                })
+                .catch(error => console.error('Error al cargar los detalles del producto:', error));
+        }
+
+        // Cargar los detalles al iniciar
+        loadProductDetails();
+    </script>
+</body>
+</html>

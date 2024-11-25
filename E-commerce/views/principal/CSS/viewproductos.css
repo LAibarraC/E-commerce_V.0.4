@@ -1,0 +1,350 @@
+.contenedor{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    margin-top: 25px;
+}
+.caja{
+    width: 65%;
+    height: 100%;
+
+
+}
+.producto{
+    display: flex;
+    width: 100%;
+    height: 100%;
+
+}
+.scrum{
+    width: 15%;
+    height: 500px;
+}
+.imagenes{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content:space-evenly; 
+    align-items: center;
+    flex-direction: column;
+    
+}
+.grupo{
+    width: 70%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(245, 245, 245, 1);
+    border-radius: 10%;
+    cursor: pointer; 
+    transition: transform 0.2s ease; 
+}
+
+.grupo:hover {
+    transform: scale(1.05); 
+}
+
+.principal{
+    width: 50%;
+    height: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    
+}
+.prins{
+    width: 65%;
+    height: 70%; 
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(245, 245, 245, 1);
+    border-radius: 10%;
+    cursor: pointer; 
+    transition: transform 0.2s ease; 
+}
+.prins:hover {
+    transform: scale(1.05); 
+}
+
+
+.datos{
+    width: 40%;
+    height: 500px;
+    padding: 10px;
+}
+.name{
+    padding: 10px;
+    margin-top: 10px;
+    background-color: rgba(245, 245, 245, 1);
+    border-radius: 10px;
+
+}
+
+.preci{
+    padding: 10px;
+    margin-top: 15px;
+    border-radius: 10px;
+    background-color: rgba(245, 245, 245, 1);
+}
+
+.descripcion{
+    padding: 10px;
+    margin-top: 15px;
+    border-radius: 10px;
+    background-color: rgba(245, 245, 245, 1);
+    word-wrap: break-word; 
+    overflow-wrap: break-word;
+}
+
+.estrella{
+    background-color: rgba(245, 245, 245, 1);
+    padding: 10px;
+    margin-top: 15px;
+    border-radius: 10px;
+}
+.color{
+    background-color: rgba(245, 245, 245, 1);
+    padding: 10px;
+    margin-top: 95px;
+    border-radius: 10px;
+}
+
+.pequenos{
+    display: flex;
+    padding: 10px;
+    margin-top: 10px;
+    justify-content:space-evenly; 
+
+}
+.peque{
+    width: 80px;
+    height: 90px;
+    background-color: rgba(245, 245, 245, 1);
+    cursor: pointer; 
+    transition: transform 0.2s ease; 
+    border-radius: 10%;
+}
+.peque:hover {
+    transform: scale(1.05); 
+}
+
+.carrito{
+    width: 35%;
+    display: flex;
+    justify-content:space-evenly; 
+    align-items: center;
+    flex-direction: column;
+
+}
+.card{
+    width: 80%;
+    height: 95%;
+    background-color: rgba(245, 245, 245, 1);
+    display: flex;
+    justify-content:space-evenly; 
+    align-items: center;
+    flex-direction: column;
+    border-radius: 10px;
+}
+.envio{
+    width: 400px;
+    padding: 5px;
+    margin-top: 10px;
+    border-radius: 10px;
+    background-color: white;
+}
+.nota{
+    width: 400px;
+    padding: 5px;
+    margin-top: 5px;
+    border-radius: 10px;
+    background-color: white;
+}
+.costo{
+    width: 400px;
+    padding: 5px;
+    margin-top: 10px;
+    border-radius: 10px;
+    background-color: white;
+}
+
+.cantidad{
+    width: 400px;
+    padding: 5px;
+    margin-top: 10px;
+    border-radius: 10px;
+    background-color: white;
+}
+.cant{
+    text-align: center;
+    width: 400px;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 10px;
+    background-color: white;
+}
+.stock{
+    width: 400px;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 10px;
+    background-color: white;
+}
+.compra{
+    width: 150px;
+    border: none;
+    padding: 5px;
+    margin-top: 5px;
+    border-radius: 5px;
+    background-color: rgba(253, 56, 79, 1);
+    color: white;
+    cursor: pointer; 
+    transition: transform 0.2s ease; 
+
+}
+.compra:hover {
+    transform: scale(1.05); 
+}
+
+.car{
+    width: 150px;
+    border: 2px solid black;
+    padding: 5px;
+    margin-top: 5px;
+    border-radius: 5px;
+    background-color: white;
+    cursor: pointer; 
+    transition: transform 0.2s ease; 
+}
+.car:hover {
+    transform: scale(1.05); 
+}
+
+.btnc{
+    text-align: center;
+    width: 30px;
+    height:20px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+.similar{
+    width: 200px;
+    margin: auto;
+    background-color: rgba(245, 245, 245, 1);
+    margin-top: 20px;
+    text-align: center;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+}
+
+
+
+.error {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    width: 100%;
+    margin: auto;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #555;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    grid-column: span 6;
+}
+
+
+.similares {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr); /* 4 columnas de igual tamaño */
+    gap: 25px; /* Espacio entre los productos */
+    padding: 10px;
+    margin-top: 20px;
+  
+
+}
+
+/* Cada tarjeta de producto */
+.product{
+    background-color: rgba(245, 245, 245, 1);
+    width:220px ;
+    height: 320px;
+    border-radius: 10px;
+    font-family: "Arial Narrow", Arial, sans-serif;
+    margin: auto;
+    padding: 5px;
+
+}
+.imagen{
+    width: 140px;
+    height: 140px;
+    margin: auto;
+    padding: 5px;
+    margin-top: 10px;
+    transition: transform 0.2s ease;
+
+}
+
+.imagen:hover {
+    transform: scale(1.05); 
+}
+.nombre{
+    text-align: center;
+    margin: 5px 0px 0px 0px ;
+}
+.estrellas{
+    margin: 5px 0px 0px 10px ;
+}
+.precio{
+    margin: 10px 0px 0px 10px ;
+
+}
+.descuento{
+    margin: 10px 0px 0px 10px ;
+}
+.visualizar{
+    margin: 20px 0px 0px 0px ;
+    text-align: center;
+}
+.btnn{
+    background-color: black;
+    color: white;
+    border: 1px solid black;
+    padding: 3px;
+    width: 120px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: background-color 0.3s, color 0.2s; 
+    padding: 2px;
+    
+}
+.btnn:hover {
+    border: 1px solid black;
+    background-color: white; 
+    color: black; 
+}
+
+
+.modal {
+    position: fixed;
+    top: 10%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    color: green;
+    padding: 20px;
+    border-radius: 10px;
+    display: none;
+    z-index: 1000;
+}
+
+.modal-content {
+    text-align: center;
+
+}

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Categoría</title>
+    <link rel="stylesheet" href="../CSS/category.css">
+</head>
+
+<body>
+    <main>
+        <h2>Nueva Categoría</h2>
+        <form class="category_form_create" id="addCategoryForm" method="POST" action="/api/categorias" enctype="multipart/form-data">
+
+            <div>
+                <label for="name">Nombre de la Categoría:</label><br>
+                <input type="text" id="name" name="name" required><br><br>
+
+                <label for="description">Descripción de la Categoría:</label><br>
+                <textarea id="description" name="description" required></textarea>
+
+                <div class="image-upload-container">
+                    <div class="image-preview" id="imagePreview">Agregar Imagen</div><br>
+                    <input type="file" id="imageInput" name="image" accept="image/*" class="hidden-input"><br>
+                    <button type="button" class="uploadButton" data-target="imageInput">Subir Imagen</button>
+                </div>
+
+                <button type="submit" class="submit-btn">Guardar Categoría</button>
+            </div>
+        </form>
+    </main>
+
+    <script>
+        document.querySelector('.uploadButton').addEventListener('click', function () {
+            const target = this.getAttribute('data-target');
+            document.getElementById(target).click();
+        });
+
+        document.getElementById('imageInput').addEventListener('change', function (event) {
+            const files = event.target.files;
+            const previewElement = document.getElementById('imagePreview');
+            if (files.length > 0) {
+                const file = files[0];
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.style.width = '100%';
+                    img.style.height = '100%';
+                    previewElement.innerHTML = ''; 
+                    previewElement.appendChild(img); 
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('addCategoryForm').addEventListener('submit', async function (event) {
+    event.preventDefault(); // Evitar que el formulario se envíe de manera tradicional
+
+    const formData = new FormData(this);
+
+    // Validar si se ha cargado una imagen
+    const imageFile = formData.get('image');
+    if (!imageFile) {
+        alert('Por favor, sube una imagen.');
+        return;
+    }
+
+    try {
+        const response = await fetch(this.action, {
+            method: 'POST',
+            body: formData
+        });
+
+        const result = await response.json();
+        if (response.ok && result.success) {
+            alert('Categoría agregada correctamente');
+            this.reset(); 
+            document.getElementById('imagePreview').innerHTML = 'Agregar Imagen'; 
+        } else {
+            throw new Error(result.message || 'Error al agregar la categoría');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Hubo un error al agregar la categoría: ' + error.message);
+    }
+});
+
+    </script>
+</body>
+
+</html>

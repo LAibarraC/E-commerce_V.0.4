@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item_Cart</title>
+    <link rel="stylesheet" href="../CSS/cart.css">
+</head>
+
+<body>
+    <div id="navbar-container">
+        <script>
+            fetch('/navbar/navbar.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('navbar-container').innerHTML = data;
+
+                    // Menú desplegable
+                    const menuButton = document.getElementById('menu-button');
+                    const submenu = document.getElementById('submenu');
+                    if (menuButton && submenu) {
+                        menuButton.addEventListener('click', function (event) {
+                            event.stopPropagation();
+                            if (submenu.style.display === 'none' || submenu.style.display === '') {
+                                submenu.style.display = 'block';
+                            } else {
+                                submenu.style.display = 'none';
+                            }
+                        });
+                        document.addEventListener('click', function (event) {
+                            if (!menuButton.contains(event.target) && !submenu.contains(event.target)) {
+                                submenu.style.display = 'none';
+                            }
+                        });
+                    }
+
+                    // Redirigir al carrito
+                    const navbarcarrito = document.querySelector('.cart-icon');
+                    if (navbarcarrito) {
+                        navbarcarrito.addEventListener('click', () => {
+                            window.location.href = '/carrito';
+                        });
+                    }
+
+                    // Redirigir al logo
+                    const navbarLogo = document.querySelector('.navbar-logo');
+                    if (navbarLogo) {
+                        navbarLogo.addEventListener('click', () => {
+                            window.location.href = '/principal';
+                        });
+                    }
+
+                    // Búsqueda
+                    const searchInput = document.querySelector('.navbar-search input');
+                    const searchButton = document.querySelector('.navbar-search .search-button');
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const query = urlParams.get('q');
+                    if (query && searchInput) {
+                        searchInput.value = decodeURIComponent(query);
+                    }
+                    if (searchInput && searchButton) {
+                        searchButton.addEventListener('click', () => {
+                            const query = searchInput.value.trim();
+                            if (query) {
+                                window.location.href = `/search?q=${encodeURIComponent(query)}`;
+                            } else {
+                                alert("Por favor ingresa un término de búsqueda.");
+                            }
+                        });
+                    }
+
+                    // Nombre de usuario
+                    const userName = localStorage.getItem('userName');
+                    const registerLink = document.querySelector('#register-link');
+                    const userId = localStorage.getItem('userId');
+
+                    if (userName && registerLink) {
+                        registerLink.textContent = userName;
+                        registerLink.href = '/perfil';
+                    }
+
+                    if (userId) {
+                        fetch(`/api/carts/${userId}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success && data.cart && data.cart.id) {
+                                    const cartId = data.cart.id;
+                                    localStorage.setItem('cartId', cartId);
+                                    console.log(cartId);
+                                    actualizarContadorCarrito(cartId);
+                                } else {
+                                    console.error('No se encontró cartId para el usuario');
+                                }
+                            })
+                            .catch(error => console.error('Error al obtener cartId del usuario:', error));
+                    }
+                })
+                .catch(error => console.error('Error al cargar el navbar:', error));
+
+            function actualizarContadorCarrito(cartId) {
+                if (!cartId) {
+                    console.error('No se encontró un cartId válido en localStorage.');
+                    return;
+                }
+
+                fetch(`/api/totalitemscart/${cartId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Error al hacer la solicitud a la API');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Respuesta de la API:', data);
+                        if (data.totalItems !== undefined) {
+                            const cartCountElement = document.getElementById('cart-count');
+                            if (cartCountElement) {
+                                cartCountElement.innerText = data.totalItems || 0; // Actualiza el contador
+                            }
+                        } else {
+                            console.error('Error: No se encontró el total de artículos en la respuesta');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al obtener el total de items del carrito:', error);
+                    });
+            }
+        </script>
+    </div>
+
+    <div class="container">
+        <div class="cart-container">
+            <div class="cart-nota">
+                <div class="nota">&nbsp;&nbsp;&nbsp;&nbsp;Carrito</div>
+                <div class="todos">
+                    <div>
+                        <input type="checkbox" name="select-all" id="select-all">&nbsp;&nbsp;&nbsp;&nbsp;
+                    </div>
+                    <div>Seleccionar Todos los elementos</div>
+                </div>
+            </div>
+
+            <div id="cart-items" class="cart-item">
+                <!-- Aquí se cargarán dinámicamente los productos del carrito -->
+            </div>
+        </div>
+
+        <div class="resumen">
+            <div class="pago">
+                <div class="resu">Resumen</div>
+                <div class="sub">Subtotal:&nbsp;&nbsp;<span id="subtotal">0 Bs.</span></div>
+                <div class="gasto">Gasto de envío:&nbsp;&nbsp;<span id="shipping">0 Bs.</span></div>
+                <div class="total">Total estimado:&nbsp;&nbsp;<span id="total">0 Bs.</span></div>
+                <div class="bb"><button class="car">Pagar</button></div>
+            </div>
+            <div class="forma">
+                <div class="p">Pagar con:</div>
+                <div class="tipo">
+                    <img src="/icon/image.png" alt="" width="100%" height="100%">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const cartId = localStorage.getItem('cartId');
+        if (cartId) {
+            fetch(`/api/cart-items/${cartId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && Array.isArray(data.items)) {
+                        renderCartItems(data.items);
+                    } else {
+                        console.error('Error: No se encontraron productos en el carrito');
+                    }
+                })
+                .catch(error => console.error('Error al obtener los productos del carrito:', error));
+        } else {
+            console.error('Error: No se encontró un cartId válido');
+        }
+
+        function renderCartItems(items) {
+            const cartItemsContainer = document.getElementById('cart-items');
+            let subtotal = 0;
+            let shippingCost = 0;
+
+            cartItemsContainer.innerHTML = ''; 
+
+            items.forEach(item => {
+                const product = item.Product;
+                const totalProductPrice = product.price * item.quantity;
+                subtotal += totalProductPrice;
+                shippingCost += 5;
+  
+                const productHTML = `
+                                    <div class="item" data-cart-item-id="${item.id}">
+                                        <div class="sel">
+                                            <div class="selec">
+                                                <input type="checkbox" name="product-${item.id}" class="product-checkbox">
+                                            </div>
+                                            <div class="imagen">
+                                                <img src="/uploads/products/${product.image1}" width="100%" height="100%">
+                                            </div>
+                                        </div>
+                                        <div class="datos">
+                                            <div class="nombre">${product.name}</div>
+                                            <div class="descrip">Descripcion: ${product.description}</div>
+                                            <div class="precio">Precio:&nbsp;&nbsp;${product.price} Bs.</div>
+                                            <div class="envio">Envio + : 5 Bs.</div>
+                                        </div>
+                                        <div class="add">
+                                            <div class="borrar">
+                                                <button class="delete-btn" data-cart-item-id="${item.id}">
+                                                    <img src="/icon/eliminar.png" alt="" width="100%" height="100%">
+                                                </button>
+                                            </div>
+                                            <div class="cant">
+                                                <button class="btnc" id="btn-minus" data-cart-item-id="${item.id}">-</button>
+                                                <span>&nbsp;&nbsp;${item.quantity}&nbsp;&nbsp;</span>
+                                                <button class="btnc" id="btn-plus" data-cart-item-id="${item.id}">+</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+
+                cartItemsContainer.innerHTML += productHTML;
+            });
+            const allProductCheckboxes = document.querySelectorAll('.product-checkbox');
+            allProductCheckboxes.forEach(checkbox => {
+                checkbox.checked = true; 
+            });
+            selectAllCheckbox.checked = true; 
+            updateSummary(subtotal, shippingCost); 
+            attachDeleteHandlers(); 
+            initSelectAll(); 
+        }
+        function updateSummary(subtotal, shippingCost) {
+            const total = subtotal + shippingCost;
+
+            document.getElementById('subtotal').textContent = `${subtotal.toFixed(2)} Bs.`;
+            document.getElementById('shipping').textContent = `${shippingCost.toFixed(2)} Bs.`;
+            document.getElementById('total').textContent = `${total.toFixed(2)} Bs.`;
+        }
+        function attachDeleteHandlers() {
+            const deleteButtons = document.querySelectorAll('.delete-btn');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const cartItemId = this.getAttribute('data-cart-item-id');
+                    deleteCartItem(cartItemId);
+                });
+            });
+        }
+        function deleteCartItem(cartItemId) {
+            fetch(`/api/cart-items/${cartItemId}`, { method: 'DELETE' })
+                .then(response => {
+                    if (response.ok) {
+                        document.querySelector(`[data-cart-item-id="${cartItemId}"]`).remove();
+                        console.log(`Producto con cartItemId ${cartItemId} eliminado`);
+                        const cartId = localStorage.getItem('cartId');
+                        if (cartId) {
+                            fetch(`/api/cart-items/${cartId}`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        renderCartItems(data.items);
+                                    }
+                                });
+                        }
+                    } else {
+                        console.error('Error al eliminar el producto del carrito');
+                    }
+                })
+                .catch(error => console.error('Error en la solicitud de eliminación:', error));
+        }
+        const selectAllCheckbox = document.getElementById('select-all');
+
+        function initSelectAll() {
+            selectAllCheckbox.addEventListener('change', function () {
+                const isChecked = this.checked;
+                const productCheckboxes = document.querySelectorAll('.item .product-checkbox');
+
+                productCheckboxes.forEach(checkbox => {
+                    checkbox.checked = isChecked;
+                });
+
+                updateSubtotal();
+            });
+        }
+
+        document.addEventListener('change', function (event) {
+            if (event.target.closest('.item .product-checkbox')) {
+                const productCheckboxes = document.querySelectorAll('.item .product-checkbox');
+                const allChecked = Array.from(productCheckboxes).every(checkbox => checkbox.checked);
+
+                selectAllCheckbox.checked = allChecked;
+
+                updateSubtotal();
+            }
+        });
+
+
+        function updateSubtotal() {
+            let subtotal = 0;
+            let shippingCost = 0;
+            const selectedItems = document.querySelectorAll('.item .product-checkbox:checked');
+
+            selectedItems.forEach(checkbox => {
+                const cartItem = checkbox.closest('.item');
+                const priceElement = cartItem.querySelector('.precio');
+                const price = parseFloat(priceElement.textContent.match(/[\d.]+/)[0]);
+                const quantity = parseInt(cartItem.querySelector('.cant span').textContent.trim());
+                subtotal += price * quantity;
+                shippingCost += 5;
+            });
+
+            const total = subtotal + shippingCost;
+            document.getElementById('subtotal').textContent = `${subtotal.toFixed(2)} Bs.`;
+            document.getElementById('shipping').textContent = `${shippingCost.toFixed(2)} Bs.`;
+            document.getElementById('total').textContent = `${total.toFixed(2)} Bs.`;
+        }
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,267 @@
+.botonesprincipales{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    margin-top: 20px;
+    gap: 40px;
+}
+.btn {
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+    padding: 3px;
+    width: 200px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: background-color 0.3s, color 0.2s; 
+}
+
+.btn:hover {
+    background-color: black; 
+    color: white; 
+    border: 1px solid white;
+}
+
+
+
+
+
+/* Lista de productos */
+.producto-lista {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr); /* 4 columnas de igual tamaño */
+    gap: 25px; /* Espacio entre los productos */
+    padding: 10px;
+    margin-top: 20px;
+  
+
+}
+
+/* Cada tarjeta de producto */
+.product{
+    background-color: rgba(245, 245, 245, 1);
+    width:220px ;
+    height: 320px;
+    border-radius: 10px;
+    font-family: "Arial Narrow", Arial, sans-serif;
+    margin: auto;
+    padding: 5px;
+
+}
+.imagen{
+    width: 140px;
+    height: 140px;
+    margin: auto;
+    padding: 5px;
+    margin-top: 10px;
+    transition: transform 0.2s ease;
+
+}
+
+.imagen:hover {
+    transform: scale(1.05); 
+}
+.nombre{
+    text-align: center;
+    margin: 5px 0px 0px 0px ;
+}
+.estrellas{
+    margin: 5px 0px 0px 10px ;
+}
+.precio{
+    margin: 10px 0px 0px 10px ;
+
+}
+.descuento{
+    margin: 10px 0px 0px 10px ;
+}
+.visualizar{
+    margin: 20px 0px 0px 0px ;
+    text-align: center;
+}
+.btnn{
+    background-color: black;
+    color: white;
+    border: 1px solid black;
+    padding: 3px;
+    width: 120px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: background-color 0.3s, color 0.2s; 
+    padding: 2px;
+    
+}
+.btnn:hover {
+    border: 1px solid black;
+    background-color: white; 
+    color: black; 
+}
+
+
+
+.producto-categorias {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 columnas de igual tamaño */
+    gap: 25px; /* Espacio entre los productos */
+    padding: 10px;
+    margin-top: 20px;
+}
+
+
+
+.categoria {
+    background-color: rgba(245, 245, 245, 1);
+    width: 270px;
+    height: 270px;
+    border-radius: 50%;
+    font-family: "Arial Narrow", Arial, sans-serif;
+    margin: auto;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer; 
+    transition: transform 0.2s ease; 
+}
+
+.categoria:hover {
+    transform: scale(1.05); 
+}
+
+.imag {
+    width: 80%;
+    height: 80%;
+    border-radius: 50%; 
+    overflow: hidden; 
+}
+
+.nombr {
+    text-align: center;
+    margin: 15px 0px 0px 0px;
+    font-family: "Arial Narrow", Arial, sans-serif;
+    font-size: 20px;
+    font-weight: bold; 
+    
+}
+.estrellas {
+    font-size: 20px;
+    color: black;
+ 
+  }
+  .estrella-vacia {
+    color: #000; /* Color de las estrellas vacías */
+  }
+  .cali{
+    font-size: 15px;
+  }
+
+
+.error {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    width: 100%;
+    margin: auto;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #555;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    grid-column: span 6;
+}
+
+
+#footer {
+    background-color: #6b6b6b;
+    color: white;
+    text-align: center;
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.footer-info, .footer-links, .footer-social {
+    width: 30%;
+    margin: 10px 0;
+}
+
+.footer-info h3, .footer-links h3, .footer-social h3 {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+.footer-links ul {
+    list-style: none;
+    padding: 0;
+    text-decoration: none;
+}
+
+.footer-links ul li {
+    margin: 5px 0;
+    text-decoration: none;
+}
+
+.footer-links a {
+    color: white;
+    text-decoration: none;
+}
+
+.footer-links a:hover {
+    text-decoration: none;
+}
+
+.social-icons a {
+    margin: 0 10px;
+}
+
+.social-icons img {
+    max-width: 30px;
+    height: auto;
+    text-decoration: none;
+}
+
+.footer-bottom {
+    background-color: #575656;
+    padding: 10px;
+    margin-top: 20px;
+}
+
+.footer-bottom p {
+    margin: 0;
+}
+
+/* Elimina el subrayado de los enlaces */
+a {
+    text-decoration: none;
+}
+
+/* Añade un estilo diferente cuando el enlace se pasa por encima (hover) */
+a:hover {
+    text-decoration: none;  /* Evita el subrayado al pasar el ratón */
+    color: #f1f1f1; /* Color del enlace al pasar el ratón (puedes ajustarlo) */
+}
+
+/* Si hay un foco (al hacer clic o tabular), también eliminar el subrayado */
+a:focus {
+    text-decoration: none;
+}
+
+/* Elimina el subrayado de las listas */
+ul {
+    list-style: none;  /* Elimina los puntos de la lista */
+    padding: 0;
+}
+
+li {
+    margin: 5px 0;
+}
+
+
+

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ElectroShop</title>
+    <link rel="stylesheet" href="../CSS/principal.css">
+</head>
+
+<body onload="cargarProductos()">
+    <div id="navbar-container">
+        <script>
+            fetch('/navbar/navbar.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('navbar-container').innerHTML = data;
+
+                    const menuButton = document.getElementById('menu-button');
+                    const submenu = document.getElementById('submenu');
+
+                    if (menuButton && submenu) {
+                        menuButton.addEventListener('click', function (event) {
+                            event.stopPropagation();
+                            if (submenu.style.display === 'none' || submenu.style.display === '') {
+                                submenu.style.display = 'block';
+                            } else {
+                                submenu.style.display = 'none';
+                            }
+                        });
+
+                        document.addEventListener('click', function (event) {
+                            if (!menuButton.contains(event.target) && !submenu.contains(event.target)) {
+                                submenu.style.display = 'none';
+                            }
+                        });
+                    }
+
+                    const navbarcarrito = document.querySelector('.cart-icon');
+                    if (navbarcarrito) {
+                        navbarcarrito.addEventListener('click', () => {
+                            window.location.href = '/carrito';
+                        });
+                    }
+
+                    const navbarLogo = document.querySelector('.navbar-logo');
+                    if (navbarLogo) {
+                        navbarLogo.addEventListener('click', () => {
+                            window.location.href = '/principal';
+                        });
+                    }
+
+                    const searchInput = document.querySelector('.navbar-search input');
+                    const searchButton = document.querySelector('.navbar-search .search-button');
+
+                    // Rellena el buscador con el término de la URL si existe
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const query = urlParams.get('q');
+                    if (query && searchInput) {
+                        searchInput.value = decodeURIComponent(query);
+                    }
+
+                    // Redirige al buscar con validación
+                    if (searchInput && searchButton) {
+                        searchButton.addEventListener('click', () => {
+                            const query = searchInput.value.trim();
+                            if (query) {
+                                window.location.href = `/search?q=${encodeURIComponent(query)}`;
+                            } else {
+                                alert("Por favor ingresa un término de búsqueda.");
+                            }
+                        });
+                    }
+
+                    // Reemplazar "Registro" por el nombre del usuario si está logueado
+                    const userName = localStorage.getItem('userName');
+                    const registerLink = document.querySelector('#register-link');
+                    const userId = localStorage.getItem('userId');
+
+                    if (userName && registerLink) {
+                        registerLink.textContent = userName;  // Cambiar el texto a nombre del usuario
+                        registerLink.href = '/perfil';  // Opcional: Redirige al perfil del usuario si se hace clic
+                    }
+
+                    if (userId) {
+                        fetch(`/api/carts/${userId}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success && data.cart && data.cart.id) {
+                                    const cartId = data.cart.id;
+                                    localStorage.setItem('cartId', cartId);
+                                    console.log(cartId);
+                                    actualizarContadorCarrito(cartId);
+                                } else {
+                                    console.error('No se encontró cartId para el usuario');
+                                }
+                            })
+                            .catch(error => console.error('Error al obtener cartId del usuario:', error));
+                    }
+
+
+                })
+                .catch(error => console.error('Error al cargar el navbar:', error));
+
+            function actualizarContadorCarrito(cartId) {
+                if (!cartId) {
+                    console.error('No se encontró un cartId válido en localStorage.');
+                    return;
+                }
+
+                fetch(`/api/totalitemscart/${cartId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Error al hacer la solicitud a la API');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Respuesta de la API:', data);
+                        if (data.totalItems !== undefined) {
+                            const cartCountElement = document.getElementById('cart-count');
+                            if (cartCountElement) {
+                                cartCountElement.innerText = data.totalItems || 0; // Actualiza el contador
+                            }
+                        } else {
+                            console.error('Error: No se encontró el total de artículos en la respuesta');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al obtener el total de items del carrito:', error);
+                    });
+            }
+
+
+
+        </script>
+    </div>
+
+
+    <div class="botonesprincipales">
+        <button onclick="cargarProductosDestacados()" class="btn" id="destacados">Destacados</button>
+        <button class="btn" id="favoritos">Favoritos</button>
+        <button onclick="cargarCategorias()" class="btn" id="categorias">Categorias</button>
+    </div>
+
+    <div id="productos-lista" class="producto-lista">
+    </div>
+
+    <div id="productos-favoritos" class="producto-lista">
+    </div>
+
+    <div id="productos-categorias" class="producto-categorias">
+    </div>
+    <div id="productos-destacados" class="producto-lista">
+    </div>
+
+</body>
+
+<script>
+
+    function cargarProductos() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const categoryIdFromURL = urlParams.get('categoryId');
+        const categoryNameFromURL = urlParams.get('categoryName');
+
+        if (categoryIdFromURL && categoryNameFromURL) {
+            cargarProductosPorCategoria(categoryIdFromURL, categoryNameFromURL);
+        } else {
+            fetch('/api/products')
+                .then(response => response.json())
+                .then(data => {
+                    const productosLista = document.getElementById('productos-lista');
+                    productosLista.innerHTML = '';
+
+                    if (data.success && Array.isArray(data.products)) {
+                        data.products.forEach(producto => {
+                            const divTarjeta = document.createElement('div');
+                            divTarjeta.classList.add('tarjeta');
+                            divTarjeta.innerHTML = `
+                                <div class="product">
+                                    <div class="imagen">
+                                        <img src="/uploads/products/${producto.image1}" width="100%" height="100%">
+                                    </div>
+                                    <div class="nombre">${producto.name}</div>
+                                    <div class="estrellas">${mostrarCalificacion(producto.rating)} <span class="cali">&nbsp;&nbsp;${producto.rating}</span></div>
+                                    <div class="precio">
+                                        <span>Precio:&nbsp;</span><span>${producto.price}</span><span>&nbsp;Bs.</span>
+                                    </div>
+                                    <div class="descuento">
+                                        <span>Descuento:&nbsp;</span><span>${producto.discount}</span><span>&nbsp;%</span>
+                                    </div>
+                                    <div class="visualizar">
+                                        <button class="btnn" data-id="${producto.id}">Visualizar</button>
+                                    </div>
+                                </div>
+                            `;
+                            productosLista.appendChild(divTarjeta);
+                        });
+                        const botonesVisualizar = document.querySelectorAll('.btnn');
+                        botonesVisualizar.forEach(boton => {
+                            boton.addEventListener('click', (event) => {
+                                const productId = event.target.getAttribute('data-id');
+                                if (productId) {
+
+                                    window.location.href = `/product-details/${productId}`;
+                                }
+                            });
+                        });
+                    }
+                })
+                .catch(error => console.error('Error al cargar los productos:', error));
+        }
+    }
+
+    window.addEventListener('load', () => {
+        cargarContenidoSegunURL();
+    });
+
+    window.addEventListener('popstate', () => {
+        cargarContenidoSegunURL();
+    });
+
+    function cargarContenidoSegunURL() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const categoria = urlParams.get('categoria');
+        const categoryId = urlParams.get('categoryId');
+        const categoryName = urlParams.get('categoryName');
+        const destacados = urlParams.get('destacados');
+
+        if (categoria === 'true') {
+            cargarCategorias();
+        } else if (categoryId && categoryName) {
+            cargarProductosPorCategoria(categoryId, categoryName);
+        } else if (destacados === 'true') {
+            cargarProductosDestacados();
+        } else {
+            cargarProductos();
+        }
+    }
+
+
+    function cargarCategorias() {
+        const newUrl = `${window.location.pathname}?categoria=true`;
+        history.pushState(null, '', newUrl);
+
+        fetch('/api/categories')
+            .then(response => response.json())
+            .then(data => {
+                const productosCategorias = document.getElementById('productos-categorias');
+                productosCategorias.innerHTML = '';
+
+                if (data && Array.isArray(data)) {
+                    data.forEach(categoria => {
+                        const divCategoria = document.createElement('div');
+                        divCategoria.classList.add('tarjeta');
+                        divCategoria.innerHTML = `
+                        <div class="categoria">
+                            <div class="imag">
+                                <img src="/uploads/categories/${categoria.image}" width="100%" height="100%">
+                            </div>
+                        </div>
+                        <div class="nombr">${categoria.name}</div>
+                    `;
+
+                        divCategoria.addEventListener('click', () => {
+                            cargarProductosPorCategoria(categoria.id, categoria.name);
+                        });
+
+                        productosCategorias.appendChild(divCategoria);
+                    });
+                } else {
+                    console.error('No se encontraron categorías o la respuesta es inválida.');
+                }
+            })
+            .catch(error => console.error('Error al cargar las categorías:', error));
+
+        document.getElementById('productos-lista').style.display = 'none';
+        document.getElementById('productos-favoritos').style.display = 'none';
+        document.getElementById('productos-destacados').style.display = 'none';
+        document.getElementById('productos-categorias').style.display = 'grid';
+    }
+
+    function cargarProductosPorCategoria(categoryId, categoryName) {
+        const newUrl = `${window.location.pathname}?categoryId=${categoryId}&categoryName=${encodeURIComponent(categoryName)}`;
+        history.pushState(null, '', newUrl);
+
+        fetch(`/api/products/categories/${categoryId}`)
+            .then(response => response.json())
+            .then(data => {
+                const productosLista = document.getElementById('productos-lista');
+                productosLista.innerHTML = '';
+
+                if (data.success && Array.isArray(data.products)) {
+                    data.products.forEach(producto => {
+                        const divTarjeta = document.createElement('div');
+                        divTarjeta.classList.add('tarjeta');
+                        divTarjeta.innerHTML = `
+                        <div class="product">
+                            <div class="imagen">
+                                <img src="/uploads/products/${producto.image1}" width="100%" height="100%">
+                            </div>
+                            <div class="nombre">${producto.name}</div>
+                            <div class="estrellas">${mostrarCalificacion(producto.rating)} <span class="cali">&nbsp;&nbsp;${producto.rating}</span></div>
+                            <div class="precio">
+                                <span>Precio:&nbsp;</span><span>${producto.price}</span><span>&nbsp;Bs.</span>
+                            </div>
+                            <div class="descuento">
+                                <span>Descuento:&nbsp;</span><span>${producto.discount}</span><span>&nbsp;%</span>
+                            </div>
+                            <div class="visualizar">
+                                <button class="btnn" data-id="${producto.id}">Visualizar</button>
+                            </div>
+                        </div>
+                    `;
+                        productosLista.appendChild(divTarjeta);
+                    });
+                    const botonesVisualizar = document.querySelectorAll('.btnn');
+                    botonesVisualizar.forEach(boton => {
+                        boton.addEventListener('click', (event) => {
+                            const productId = event.target.getAttribute('data-id');
+                            if (productId) {
+
+                                window.location.href = `/product-details/${productId}`;
+                            }
+                        });
+                    });
+                } else {
+                    productosLista.innerHTML = `
+                    <div class="error">
+                        No hay productos disponibles en la categoría "${categoryName}".
+                    </div>`;
+                }
+
+                document.getElementById('productos-categorias').style.display = 'none';
+                document.getElementById('productos-destacados').style.display = 'none';
+                document.getElementById('productos-lista').style.display = 'grid';
+            })
+            .catch(error => console.error('Error al cargar los productos de la categoría:', error));
+    }
+
+    function cargarProductosDestacados() {
+        // Actualizar la URL sin recargar la página
+        const newUrl = `${window.location.pathname}?destacados=true`;
+        if (window.location.search !== '?destacados=true') {
+            history.pushState(null, '', newUrl);
+        }
+
+        // Petición para obtener productos destacados
+        fetch('/api/product/featureds')
+            .then(response => response.json())
+            .then(data => {
+                const productosLista = document.getElementById('productos-destacados');
+                productosLista.innerHTML = ''; // Limpiar los productos existentes
+
+                if (data.success && Array.isArray(data.products)) {
+                    data.products.forEach(producto => {
+                        const divTarjeta = document.createElement('div');
+                        divTarjeta.classList.add('tarjeta');
+                        divTarjeta.innerHTML = `
+                        <div class="product">
+                            <div class="imagen">
+                                <img src="/uploads/products/${producto.image1}" width="100%" height="100%">
+                            </div>
+                            <div class="nombre">${producto.name}</div>
+                            <div class="estrellas">${mostrarCalificacion(producto.rating)} <span class="cali">&nbsp;&nbsp;${producto.rating}</span></div>
+                            <div class="precio">
+                                <span>Precio:&nbsp;</span><span>${producto.price}</span><span>&nbsp;Bs.</span>
+                            </div>
+                            <div class="descuento">
+                                <span>Descuento:&nbsp;</span><span>${producto.discount}</span><span>&nbsp;%</span>
+                            </div>
+                            <div class="visualizar">
+                                <button class="btnn" data-id="${producto.id}">Visualizar</button>
+                            </div>
+                        </div>
+                    `;
+                        productosLista.appendChild(divTarjeta);
+                    });
+                    const botonesVisualizar = document.querySelectorAll('.btnn');
+                    botonesVisualizar.forEach(boton => {
+                        boton.addEventListener('click', (event) => {
+                            const productId = event.target.getAttribute('data-id');
+                            if (productId) {
+
+                                window.location.href = `/product-details/${productId}`;
+                            }
+                        });
+                    });
+                } else {
+                    productosLista.innerHTML = `
+                    <div class="error">
+                        No hay productos destacados disponibles.
+                    </div>
+                `;
+                }
+
+                document.getElementById('productos-categorias').style.display = 'none';
+                document.getElementById('productos-favoritos').style.display = 'none';
+                document.getElementById('productos-lista').style.display = 'none';
+                document.getElementById('productos-destacados').style.display = 'grid';
+            })
+            .catch(error => console.error('Error al cargar los productos destacados:', error));
+    }
+    function mostrarCalificacion(rating) {
+        const estrellasCompletas = Math.floor(rating);
+        const estrellasVacías = 5 - Math.ceil(rating);
+        const estrellasParciales = rating % 1;
+        let estrellasHTML = '';
+        estrellasHTML += '★'.repeat(estrellasCompletas);
+        if (estrellasParciales > 0) {
+            estrellasHTML += '★';
+        }
+        estrellasHTML += '☆'.repeat(estrellasVacías);
+        return estrellasHTML;
+    }
+</script>
+
+</html>

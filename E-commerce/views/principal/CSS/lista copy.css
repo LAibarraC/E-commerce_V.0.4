@@ -1,0 +1,28 @@
+.categoria {
+    background-color: rgba(245, 245, 245, 1);
+    width: 270px;
+    height: 270px;
+    border-radius: 50%; 
+    font-family: "Arial Narrow", Arial, sans-serif;
+    margin: auto;
+    text-align: center;
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+}
+
+.imagen {
+    width: 80%;
+    height: 80%;
+    border-radius: 50%; 
+    overflow: hidden; 
+}
+
+.nombre {
+    text-align: center;
+    margin: 15px 0px 0px 0px;
+    font-family: "Arial Narrow", Arial, sans-serif;
+    font-size: 20px;
+    font-weight: bold; 
+    
+}

@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../CSS/viewproductos.css">
+</head>
+
+<body onload="cargardato()">
+
+    <div id="navbar-container">
+        <script>
+            fetch('/navbar/navbar.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('navbar-container').innerHTML = data;
+
+                    // Menú desplegable
+                    const menuButton = document.getElementById('menu-button');
+                    const submenu = document.getElementById('submenu');
+                    if (menuButton && submenu) {
+                        menuButton.addEventListener('click', function (event) {
+                            event.stopPropagation();
+                            if (submenu.style.display === 'none' || submenu.style.display === '') {
+                                submenu.style.display = 'block';
+                            } else {
+                                submenu.style.display = 'none';
+                            }
+                        });
+                        document.addEventListener('click', function (event) {
+                            if (!menuButton.contains(event.target) && !submenu.contains(event.target)) {
+                                submenu.style.display = 'none';
+                            }
+                        });
+                    }
+
+                    // Redirigir al carrito
+                    const navbarcarrito = document.querySelector('.cart-icon');
+                    if (navbarcarrito) {
+                        navbarcarrito.addEventListener('click', () => {
+                            window.location.href = '/carrito';
+                        });
+                    }
+
+                    // Redirigir al logo
+                    const navbarLogo = document.querySelector('.navbar-logo');
+                    if (navbarLogo) {
+                        navbarLogo.addEventListener('click', () => {
+                            window.location.href = '/principal';
+                        });
+                    }
+
+                    // Búsqueda
+                    const searchInput = document.querySelector('.navbar-search input');
+                    const searchButton = document.querySelector('.navbar-search .search-button');
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const query = urlParams.get('q');
+                    if (query && searchInput) {
+                        searchInput.value = decodeURIComponent(query);
+                    }
+                    if (searchInput && searchButton) {
+                        searchButton.addEventListener('click', () => {
+                            const query = searchInput.value.trim();
+                            if (query) {
+                                window.location.href = `/search?q=${encodeURIComponent(query)}`;
+                            } else {
+                                alert("Por favor ingresa un término de búsqueda.");
+                            }
+                        });
+                    }
+
+                    // Nombre de usuario
+                    const userName = localStorage.getItem('userName');
+                    const registerLink = document.querySelector('#register-link');
+                    const userId = localStorage.getItem('userId');
+
+                    if (userName && registerLink) {
+                        registerLink.textContent = userName;
+                        registerLink.href = '/perfil';
+                    }
+
+                    if (userId) {
+                        fetch(`/api/carts/${userId}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success && data.cart && data.cart.id) {
+                                    const cartId = data.cart.id;
+                                    localStorage.setItem('cartId', cartId);
+                                    console.log(cartId);
+                                    actualizarContadorCarrito(cartId);
+                                } else {
+                                    console.error('No se encontró cartId para el usuario');
+                                }
+                            })
+                            .catch(error => console.error('Error al obtener cartId del usuario:', error));
+                    }
+                })
+                .catch(error => console.error('Error al cargar el navbar:', error));
+
+            function actualizarContadorCarrito(cartId) {
+                if (!cartId) {
+                    console.error('No se encontró un cartId válido en localStorage.');
+                    return;
+                }
+
+                fetch(`/api/totalitemscart/${cartId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Error al hacer la solicitud a la API');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Respuesta de la API:', data);
+                        if (data.totalItems !== undefined) {
+                            const cartCountElement = document.getElementById('cart-count');
+                            if (cartCountElement) {
+                                cartCountElement.innerText = data.totalItems || 0; // Actualiza el contador
+                            }
+                        } else {
+                            console.error('Error: No se encontró el total de artículos en la respuesta');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al obtener el total de items del carrito:', error);
+                    });
+            }
+        </script>
+    </div>
+
+
+    <div class="contenedor">
+        <div class="caja">
+            <div class="producto">
+                <div class="scrum">
+                    <div class="imagenes">
+                        <div class="grupo">
+                            <img src=" " alt="" width="100%" height="100%">
+                        </div>
+                        <div class="grupo">
+                            <img src=" " alt="" width="100%" height="100%">
+                        </div>
+                        <div class="grupo">
+                            <img src="" alt="" width="100%" height="100%">
+                        </div>
+                    </div>
+                </div>
+                <div class="principal">
+                    <div class="prins">
+                        <img src="" alt="" width="100%" height="100%">
+                    </div>
+                </div>
+                <div class="datos">
+                    <div class="name">
+                    </div>
+                    <div class="preci">
+                        precio: &nbsp;&nbsp;<span>Bs.</span>
+                    </div>
+                    <div class="descripcion">
+                        descripcion
+                    </div>
+                    <div class="estrella">
+                        estrellas
+                    </div>
+                    <div class="color">
+                        Color:&nbsp;&nbsp;<span>red</span>
+                    </div>
+                    <div class="pequenos">
+                        <div class="peque">
+                            <img src="" alt="" width="100%" height="100%">
+                        </div>
+                        <div class="peque">
+                            <img src="" alt="" width="100%" height="100%">
+                        </div>
+                        <div class="peque">
+                            <img src="" alt="" width="100%" height="100%">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="carrito">
+            <div class="card">
+                <div class="envio">Envio:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span>Bolivia</span></div>
+                <div class="nota">Compromiso de ElectroShop</div>
+                <div class="costo">Costo Total: <span id="total-price">0<span>&nbsp;&nbsp;Bs.</span></span></div>
+                <div class="nota">Seguridad y Privacidad</div>
+                <div class="cantidad">cantidad:</div>
+                <div class="cant"><button class="btnc" id="btn-minus">-</button><span id="quantity">0</span><button
+                        class="btnc" id="btn-plus">+</button></div>
+                <div class="stock">Disponibles:&nbsp;&nbsp;<span>99</span></div>
+                <div><button class="compra">Comprar</button></div>
+                <div><button class="car" onclick="agregarAlCarrito()">Agregar carrito</button></div>
+
+            </div>
+        </div>
+    </div>
+    <div class="similar">Productos Similares</div>
+    <div class="similares">
+
+    </div>
+    <div id="successModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <p id="modalMessage">Producto agregado al carrito.</p>
+        </div>
+    </div>
+
+    <script>
+        function cargardato() {
+            const pathParts = window.location.pathname.split('/');
+            const productId = pathParts[pathParts.length - 1];
+            console.log(productId);
+
+            if (productId) {
+                fetch(`/api/products/${productId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const producto = data.product;
+
+                            document.querySelector('.name').textContent = producto.name;
+                            document.querySelector('.preci').innerHTML = `Precio: <span>${producto.price}</span> <span>Bs.</span>`;
+                            document.querySelector('.descripcion').textContent = producto.description;
+                            document.querySelector('.estrella').textContent = `Calificación:  ${mostrarCalificacion(producto.rating)}`;
+                            document.querySelector('.color span').textContent = producto.color1 || 'No disponible';
+                            document.querySelector('.stock span').textContent = producto.stock;
+
+                            const imageContainers = document.querySelectorAll('.grupo img');
+                            const thumbnails = document.querySelectorAll('.peque img');
+                            const principalImage = document.querySelector('.prins img');
+                            const colorText = document.querySelector('.color span');
+
+                            const images = [producto.image1, producto.image2, producto.image3];
+                            const colors = [producto.color1, producto.color2, producto.color3];
+
+                            images.forEach((img, index) => {
+                                if (imageContainers[index]) {
+                                    imageContainers[index].src = `/uploads/products/${img}`;
+                                    imageContainers[index].dataset.color = colors[index];
+                                }
+                                if (thumbnails[index]) {
+                                    thumbnails[index].src = `/uploads/products/${img}`;
+                                    thumbnails[index].dataset.color = colors[index];
+                                }
+                            });
+
+                            principalImage.src = `/uploads/products/${producto.image1}`;
+                            principalImage.dataset.color = producto.color1;
+
+                            document.querySelectorAll('.grupo img, .peque img').forEach((imgElement, index) => {
+                                imgElement.addEventListener('click', function () {
+                                    principalImage.src = imgElement.src;
+                                    colorText.textContent = imgElement.dataset.color || 'No disponible';
+                                });
+                            });
+
+                            const stock = producto.stock;
+                            const precio = producto.price;
+                            let cantidad = 0;
+                            const quantityElement = document.getElementById('quantity');
+                            const btnMinus = document.getElementById('btn-minus');
+                            const btnPlus = document.getElementById('btn-plus');
+                            const totalPriceElement = document.getElementById('total-price');
+
+                            function updateQuantity() {
+                                quantityElement.textContent = cantidad;
+                                updateTotal();
+                            }
+
+                            function updateTotal() {
+                                const total = cantidad * precio;
+                                totalPriceElement.textContent = total.toFixed(2);
+                            }
+
+                            btnMinus.addEventListener('click', () => {
+                                if (cantidad > 0) {
+                                    cantidad--;
+                                    updateQuantity();
+                                }
+                            });
+                            btnPlus.addEventListener('click', () => {
+                                if (cantidad < stock) {
+                                    cantidad++;
+                                    updateQuantity();
+                                }
+                            });
+                            updateQuantity();
+                            fetch(`/api/products/${producto.id}/similar`)
+                                .then(response => response.json())
+                                .then(similarData => {
+                                    const similaresContainer = document.querySelector('.similares');
+                                    if (similarData.success && Array.isArray(similarData.products) && similarData.products.length > 0) {
+                                        similarData.products.forEach(producto => {
+                                            const divTarjeta = document.createElement('div');
+                                            divTarjeta.classList.add('tarjeta');
+                                            divTarjeta.innerHTML = `
+                                                                <div class="product">
+                                                                    <div class="imagen">
+                                                                        <img src="/uploads/products/${producto.image1}" width="100%" height="100%">
+                                                                    </div>
+                                                                    <div class="nombre">${producto.name}</div>
+                                                                    <div class="estrellas">${mostrarCalificacion(producto.rating)} <span class="cali">&nbsp;&nbsp;${producto.rating}</span></div>
+                                                                    <div class="precio">
+                                                                        <span>Precio:&nbsp;</span><span>${producto.price}</span><span>&nbsp;Bs.</span>
+                                                                    </div>
+                                                                    <div class="descuento">
+                                                                        <span>Descuento:&nbsp;</span><span>${producto.discount}</span><span>&nbsp;%</span>
+                                                                    </div>
+                                                                    <div class="visualizar">
+                                                                        <button class="btnn" data-id="${producto.id}">Visualizar</button>
+                                                                    </div>
+                                                                </div>
+                                                            `;
+                                            similaresContainer.appendChild(divTarjeta);
+                                        });
+                                        // Añadir evento para visualizar producto
+                                        const botonesVisualizar = document.querySelectorAll('.btnn');
+                                        botonesVisualizar.forEach(boton => {
+                                            boton.addEventListener('click', (event) => {
+                                                const productId = event.target.getAttribute('data-id');
+                                                if (productId) {
+                                                    window.location.href = `/product-details/${productId}`;
+                                                }
+                                            });
+                                        });
+                                    } else {
+                                        similaresContainer.innerHTML = `
+                                                                        <div class="error">
+                                                                            "No hay productos similares al producto".
+                                                                        </div>`;
+                                    }
+                                })
+                                .catch(error => console.error('Error al cargar productos similares:', error));
+
+
+                        } else {
+                            console.error("Producto no encontrado.");
+                        }
+                    })
+                    .catch(error => console.error('Error al cargar los detalles del producto:', error));
+            } else {
+                console.error("ID del producto no proporcionado en la URL.");
+            }
+        }
+        function agregarAlCarrito() {
+            const quantity = parseInt(document.getElementById('quantity').innerText, 10);
+            const pathParts = window.location.pathname.split('/');
+            const productId = pathParts[pathParts.length - 1];
+            const userId = localStorage.getItem('userId');
+
+            if (!userId) {
+                alert("Por favor, inicia sesión antes de agregar productos al carrito.");
+                return;
+            }
+
+            if (quantity <= 0) {
+                alert("Por favor, selecciona una cantidad mayor a 0.");
+                return;
+            }
+
+            let cartId;
+
+            // Verifica si existe un carrito para el usuario
+            fetch(`/api/carts/${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Si el carrito ya existe
+                        cartId = data.cart.id;
+                        console.log("Carrito encontrado, ID:", cartId);
+                        return cartId;
+                    } else {
+                        // Crear un nuevo carrito
+                        return fetch(`/api/carts`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ userId })
+                        })
+                            .then(response => response.json())
+                            .then(newCartData => {
+                                if (newCartData.success) {
+                                    cartId = newCartData.cart.id;
+                                    console.log("Nuevo carrito creado, ID:", cartId);
+                                    return cartId;
+                                } else {
+                                    throw new Error("Error al crear un nuevo carrito.");
+                                }
+                            });
+                    }
+                })
+                .then(cartId => {
+                    // Crear un cart-item con el cartId obtenido
+                    return fetch(`/api/cart-items`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ cartId, productId, quantity })
+                    });
+                })
+                .then(response => response.json())
+                .then(itemData => {
+                    if (itemData.success) {
+                        showSuccessModal();
+                        return fetch(`/api/products/${productId}`)
+                            .then(response => response.json())
+                            .then(productData => {
+                                if (productData.success) {
+                                    const updatedStock = productData.product.stock - quantity;
+                                    if (updatedStock < 0) {
+                                        alert("No hay suficiente stock disponible.");
+                                        throw new Error("Stock insuficiente.");
+                                    }
+                                    return fetch(`/api/products/${productId}`, {
+                                        method: 'PUT',
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify({
+                                            stock: updatedStock,
+                                            categoryId: productData.product.categoryId
+                                        })
+                                    });
+                                } else {
+                                    throw new Error('Producto no encontrado.');
+                                }
+                            });
+                    } else {
+                        throw new Error('Error al agregar producto al carrito.');
+                    }
+                })
+                .then(response => response.json())
+                .then(updateData => {
+                    if (updateData.success) {
+                        console.log("Stock actualizado correctamente.");
+                        document.getElementById('quantity').innerText = ''; // Limpia la cantidad seleccionada
+                        actualizarContadorCarrito(cartId);
+                        location.reload();
+                    } else {
+                        console.error("Error al actualizar el stock.");
+                    }
+                })
+                .catch(error => console.error('Error en el proceso:', error));
+        }
+
+
+
+        function showSuccessModal() {
+            const modal = document.getElementById('successModal');
+            modal.style.display = 'block';
+
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 3000);
+        }
+
+        function mostrarCalificacion(rating) {
+            const estrellasCompletas = Math.floor(rating);
+            const estrellasVacías = 5 - Math.ceil(rating);
+            const estrellasParciales = rating % 1;
+            let estrellasHTML = '';
+            estrellasHTML += '★'.repeat(estrellasCompletas);
+            if (estrellasParciales > 0) {
+                estrellasHTML += '★';
+            }
+            estrellasHTML += '☆'.repeat(estrellasVacías);
+            return estrellasHTML;
+        }
+
+    </script>
+</body>
+
+</html>
