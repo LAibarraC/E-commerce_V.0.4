@@ -1,4 +1,4 @@
-const CartItem = require('../models/cartitem');
+const CartItem = require('../models/cartItem');
 const Product = require('../models/product'); // Importar el modelo Product
 
 class CartItemRepository {
