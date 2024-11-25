@@ -1,4 +1,4 @@
-const cartItemService = require('../services/cart_ItemService');
+const cartItemService = require('../services/cartItemService');
 const Joi = require('joi');
 
 class CartItemController {
