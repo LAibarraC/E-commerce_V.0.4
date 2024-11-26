@@ -440,7 +440,12 @@
                         console.log("Stock actualizado correctamente.");
                         document.getElementById('quantity').innerText = ''; // Limpia la cantidad seleccionada
                         actualizarContadorCarrito(cartId);
-                        location.reload();
+                        //location.reload();
+
+                        showSuccessModal();
+                        setTimeout(() => {
+                            location.reload();
+                        }, 3000); // Espera 3 segundos antes de recargar la página
                     } else {
                         console.error("Error al actualizar el stock.");
                     }
@@ -454,9 +459,9 @@
             const modal = document.getElementById('successModal');
             modal.style.display = 'block';
 
-            setTimeout(() => {
-                modal.style.display = 'none';
-            }, 3000);
+            //setTimeout(() => {
+            //   modal.style.display = 'none';
+            //}, 3000);
         }
 
         function mostrarCalificacion(rating) {
